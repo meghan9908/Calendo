@@ -16,7 +16,9 @@ export type eventType = {
     duration:number,
     createdAt:string,
     bookingTime:Record<Weekday,timeSchema>
-    
-        
-
+}
+export type profileType ={
+    email: string;
+    username: string;
+    grantId:string;
 }

@@ -186,7 +186,7 @@ export default function TimePicker({
                             return (
                                 <Link
                                     key={index}
-                                    href={isBusy ? "#" : `/${meetingUri}/${slot.toISOString()}`}
+                                    href={isBusy ? "#" : `./${meetingUri}/${slot.toISOString()}`}
                                     className={clsx(
                                         "block py-2 mb-1 px-4 gap-2 rounded",
                                         isBusy

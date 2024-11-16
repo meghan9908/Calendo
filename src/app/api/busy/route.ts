@@ -26,9 +26,9 @@ export async function GET(req:NextRequest){
         })
         console.log('Calendar:', calendar)
         if(calendar?.data?.[0]){
-            //@ts-ignore
+            //@ts-expect-error
             const slots = calendar.data?.[0]?.timeSlots as TimeSlot
-             //@ts-ignore
+             //@ts-expect-error
             const busySlots = slots?.filter((slot) =>slot.status == 'busy')
             return  Response.json(busySlots,{status:200})
         }

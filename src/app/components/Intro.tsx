@@ -1,5 +1,6 @@
 'use client';
 import { PlayIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -28,11 +29,11 @@ export default function Intro() {
                 Calendo is your scheduling automation platform for eliminating the back-and-forth emails to find the perfect time — and so much more.
             </p>
             <div className='flex gap-10 items-center justify-center mt-5 text-2xl'>
-                <a href='/get-started' className='bg-black py-2 px-4 rounded-full text-white'>Get Started</a>
-                <a href='/watch-video' className='border rounded-full flex gap-2 items-center text-slate-800 py-2 px-4'>
+                <Link href='/get-started' className='bg-black py-2 px-4 rounded-full text-white'>Get Started</Link>
+                <Link href='/watch-video' className='border rounded-full flex gap-2 items-center text-slate-800 py-2 px-4'>
                     <PlayIcon size={18} />
                     Watch video
-                </a>
+                </Link>
             </div>
         </section>
     );

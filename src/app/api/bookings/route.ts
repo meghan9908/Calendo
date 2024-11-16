@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
         const bookingData = {
             ...data,
             eventTypeId: etDoc._id,
+            when:data.bookingTime,
         };
         const booking = await BookingModel.create(bookingData);
 

@@ -3,7 +3,7 @@ import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         await mongoose.connect(process.env.MONGODB_URI as string);
 

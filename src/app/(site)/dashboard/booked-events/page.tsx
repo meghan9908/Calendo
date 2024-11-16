@@ -1,8 +1,9 @@
+import DashboardNav from "@/app/components/dashboard_Nav";
 import {session} from "@/app/libs/session";
 import {BookingModel} from "@/app/models/booking";
 import {EventTypeModel} from "@/app/models/events"
 import {format} from "date-fns";
-import {Calendar, CircleUser, NotepadText, User} from "lucide-react";
+import {Calendar, CircleUser, NotepadText} from "lucide-react";
 import mongoose from "mongoose";
 
 
@@ -15,6 +16,7 @@ export default async function DashboardPage() {
   }, {}, {sort: 'when'});
   return (
     <>
+      <DashboardNav/>
       <div className="mt-8">
         {bookedEvents.map(booking => {
           const eventTypeDoc = eventTypeDocs
@@ -34,7 +36,7 @@ export default async function DashboardPage() {
               <div className="flex gap-2 items-center my-1">
                 <Calendar size="16"/>
                 <span>
-                  {format(booking.when, 'EEEE, MMMM d, HH:mm')}
+                  {format(booking?.when as Date, 'EEEE, MMMM d, HH:mm')}
                 </span>
               </div>
               <div className="flex gap-2 items-center my-1">

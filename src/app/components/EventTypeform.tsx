@@ -6,9 +6,6 @@ import clsx from "clsx";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import EventDeletion from "./event_deletion";
-import { session } from "../libs/session";
-import mongoose from "mongoose";
-import { ProfileModel } from "../models/profile";
 import { weekdays } from "../libs/shared";
 
 export default function EventTypeForm({ doc }: { doc?: eventType }) {
@@ -93,7 +90,7 @@ export default function EventTypeForm({ doc }: { doc?: eventType }) {
 
         const filteredBookingTime = Object.fromEntries(
             Object.entries(bookingTime).filter(
-                ([_, { active }]) => active
+                ([,{ active }]) => active
             )
         );
 
