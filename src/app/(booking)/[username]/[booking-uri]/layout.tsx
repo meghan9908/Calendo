@@ -24,13 +24,16 @@ export default async function RootLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: LayoutParams;
+    params: Promise<LayoutParams>; // Handle params as a Promise
 }) {
+    // Resolve the params promise
+    const resolvedParams = await params;
+
     // Connect to the database
     await mongoose.connect(process.env.MONGODB_URI as string);
 
     // Fetch the profile document based on username
-    const profileDoc = await ProfileModel.findOne({ username: params.username });
+    const profileDoc = await ProfileModel.findOne({ username: resolvedParams.username });
     if (!profileDoc) {
         return (
             <html lang="en">
@@ -48,7 +51,7 @@ export default async function RootLayout({
     // Fetch the event type document based on profile email and booking URI
     const eventDoc = await EventTypeModel.findOne({
         email: profileDoc.email,
-        uri: params["booking-uri"],
+        uri: resolvedParams["booking-uri"],
     });
 
     return (
