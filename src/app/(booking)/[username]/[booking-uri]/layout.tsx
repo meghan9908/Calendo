@@ -5,7 +5,6 @@ import "@/app/globals.css";
 import { EventTypeModel } from "@/app/models/events";
 import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
-import { ReactNode } from "react";
 
 const noto = Noto_Sans({ subsets: ["latin"], weight: ["200", "400", "600", "800"] });
 
