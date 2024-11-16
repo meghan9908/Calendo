@@ -1,5 +1,6 @@
 import "./../globals.css";
 import {Noto_Sans} from "next/font/google";
+import { ReactNode } from "react";
 
 export const metadata = {
   title: 'Next.js',
@@ -8,14 +9,24 @@ export const metadata = {
 
 const noto = Noto_Sans({subsets: ['latin'], weight: ['300', '400', '600', '700']});
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+type BookingLayoutProps = {
+  children: ReactNode;
+};
+
+export default function BookingLayout({ children }: BookingLayoutProps) {
   return (
-    <html lang="en" className={noto.className}>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <main>
+          {/* Add high-level navigation, headers, or any shared booking layout */}
+          <header className="bg-gray-800 text-white py-4">
+            <div className="container mx-auto">
+              <h1>Booking Platform</h1>
+            </div>
+          </header>
+          <div>{children}</div>
+        </main>
+      </body>
     </html>
-  )
+  );
 }
