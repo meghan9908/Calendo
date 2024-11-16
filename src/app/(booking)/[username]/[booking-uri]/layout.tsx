@@ -15,7 +15,6 @@ export const metadata: Metadata = {
 };
 
 type PageProps = {
-    children: ReactNode;
     params: {
         username: string;
         "booking-uri": string;
@@ -23,7 +22,7 @@ type PageProps = {
     };
 };
 
-export default async function RootLayout(pageProps: PageProps) {
+export default async function RootLayout({children,pageProps}: {children: React.ReactNode,pageProps:PageProps}) {
     // Connect to the database
     await mongoose.connect(process.env.MONGODB_URI as string);
 
@@ -85,7 +84,7 @@ export default async function RootLayout(pageProps: PageProps) {
 
                                 {/* Content Section */}
                                 <div className="grow text-center px-8 pt-8">
-                                    {pageProps?.children}
+                                    {children}
                                 </div>
                             </div>
                         </div>
