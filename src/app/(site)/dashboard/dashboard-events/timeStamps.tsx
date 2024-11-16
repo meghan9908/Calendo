@@ -12,7 +12,7 @@ export default function Timestamps({steps=30,value,onChange}
     return(
         <select value={value} key ={Date()} onChange ={ev =>onChange(ev.target.value)}>
         {times.map(time=>(
-        <option value={time}>{time}</option>
+        <option key={time} value={time}>{time}</option>
         ))}
     </select>
     )
