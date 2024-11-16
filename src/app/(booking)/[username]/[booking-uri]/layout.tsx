@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 type PageProps = {
-    children:ReactNode,
+    children: ReactNode;
     params: {
         username: string;
         "booking-uri": string;
@@ -26,10 +26,11 @@ type PageProps = {
 export default async function RootLayout(pageProps: PageProps) {
     // Connect to the database
     await mongoose.connect(process.env.MONGODB_URI as string);
-    const params = await pageProps?.params;
+
+    const params = pageProps.params; // Do not await, it's a plain object.
 
     // Fetch the profile document based on username
-    const profileDoc = await ProfileModel.findOne({ username:params?.username });
+    const profileDoc = await ProfileModel.findOne({ username: params.username });
     if (!profileDoc) {
         return (
             <html lang="en">
@@ -49,7 +50,7 @@ export default async function RootLayout(pageProps: PageProps) {
         email: profileDoc.email,
         uri: params["booking-uri"],
     });
-    // Render the main layout if both documents are found
+
     return (
         <html lang="en">
             <body className={`${noto.className} antialiased`}>
@@ -66,18 +67,18 @@ export default async function RootLayout(pageProps: PageProps) {
                                 {/* Event Details Section */}
                                 <div className="bg-blue-100/50 p-8 w-64">
                                     <h1 className="text-2xl mb-4 font-bold border-b-2 border-black/10">
-                                        {eventDoc.title}
+                                        {eventDoc?.title || "Event not found"}
                                     </h1>
                                     <div className="grid gap-y-4 grid-cols-[40px_1fr] py-2">
                                         <div>
                                             <Clock />
                                         </div>
-                                        <div>{eventDoc.duration} minutes</div>
+                                        <div>{eventDoc?.duration || 0} minutes</div>
                                         <div>
                                             <Info />
                                         </div>
                                         <div className="max-h-96 overflow-hidden text-sm text-gray-700">
-                                            {eventDoc.description || "No description available"}
+                                            {eventDoc?.description || "No description available"}
                                         </div>
                                     </div>
                                 </div>
@@ -93,5 +94,4 @@ export default async function RootLayout(pageProps: PageProps) {
             </body>
         </html>
     );
-
 }
