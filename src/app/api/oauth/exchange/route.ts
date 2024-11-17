@@ -39,8 +39,8 @@ export async function GET(req: NextRequest) {
   console.log("debuging....");
   console.log("received from nylas",email)
   const session_email  = session().get("email");
-  console.log("session_email",email)
-  
+  console.log("session_email",session_email);
+
 
 
 
