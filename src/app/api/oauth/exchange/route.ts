@@ -36,6 +36,11 @@ export async function GET(req: NextRequest) {
   }
   
   await session().set('email', email);
+  console.log("debuging....");
+  console.log("received from nylas",email)
+  const session_email  = session().get("email");
+  console.log("session_email",email)
+  
 
 
 
