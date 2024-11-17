@@ -7,6 +7,7 @@ import { session } from "@/app/libs/session";
 export default async function Header() {
     const sessionData = await session()
     const email =await sessionData && await sessionData?.get('email');
+    console.log("session_email_header", email);
     return (    
         <header className="flex gap-6 text-gray-light justify-between mx-10 py-2">
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=event_note" />
@@ -24,6 +25,7 @@ export default async function Header() {
             </div>
 
             {email ? (
+                
                 <div>
                     <nav className="flex items-center gap-4">
                         <Link href="/dashboard" className="text-white font-bold bg-blue-600 px-3 p-3 rounded-full">Dashboard</Link>
