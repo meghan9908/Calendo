@@ -2,10 +2,10 @@ import { nylas, nylasConfig } from "@/app/libs/nylas";
 import { session } from "@/app/libs/session";
 import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
-import { NextApiRequest } from "next";
 import { redirect } from "next/navigation";
+import { NextRequest } from "next/server";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   console.log("Received callback from Nylas");
   const url = new URL(req.url ?? "");
   const code = url.searchParams.get('code');

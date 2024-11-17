@@ -1,22 +1,22 @@
-import { ReactNode } from "react";
 import mongoose from "mongoose";
+import { ReactNode } from "react";
 import { ProfileModel } from "@/app/models/profile";
 import { EventTypeModel } from "@/app/models/events";
 
-type BookingBoxLayoutProps = {
+type LayoutProps = {
   children: ReactNode;
-  params: {
-    username: string;
-    "booking-uri": string;
-  };
+  params: Promise<{ username: string; "booking-uri": string }>;
 };
 
-export default async function BookingBoxLayout({ children, params }: BookingBoxLayoutProps) {
-  // Database connection
+export default async function Layout({ children, params }: LayoutProps) {
+  // Connect to the database
   await mongoose.connect(process.env.MONGODB_URI as string);
 
-  // Fetch profile document
-  const profileDoc = await ProfileModel.findOne({ username: params.username });
+  // Resolve the params promise
+  const resolvedParams = await params;
+
+  // Fetch profile document based on the username
+  const profileDoc = await ProfileModel.findOne({ username: resolvedParams.username });
   if (!profileDoc) {
     return (
       <html lang="en">
@@ -31,10 +31,10 @@ export default async function BookingBoxLayout({ children, params }: BookingBoxL
     );
   }
 
-  // Fetch event document
+  // Fetch event document based on profile email and booking URI
   const eventDoc = await EventTypeModel.findOne({
     email: profileDoc.email,
-    uri: params["booking-uri"],
+    uri: resolvedParams?.["booking-uri"],
   });
 
   return (

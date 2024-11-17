@@ -4,30 +4,58 @@ import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     username: string;
     "booking-uri": string;
-  };
+  }>;
 };
 
-export default async function BookingPage(props: PageProps) {
-  const  params  =await props?.params;
-  await mongoose.connect(process.env.MONGODB_URI as string);
-  const ProfileDoc = await ProfileModel?.findOne({
-    username: params?.username,
-  });
-  if (!ProfileDoc) {
-    return 404;
+export default async function BookingPage({ params }: PageProps) {
+  // Resolve params from the promise
+  const { username, "booking-uri": bookingUri } = await params;
+
+  // Connect to the database
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+  } catch (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold">Failed to connect to the database:{error as string}</h1>
+      </div>
+    );
   }
-  const etDoc = await EventTypeModel?.findOne({
-    email: ProfileDoc?.email,
-    uri: params?.["booking-uri"],
+
+  // Fetch profile document
+  const profileDoc = await ProfileModel.findOne({ username });
+  if (!profileDoc) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold">Profile not found</h1>
+      </div>
+    );
+  }
+
+  // Fetch event type document
+  const eventDoc = await EventTypeModel.findOne({
+    email: profileDoc.email,
+    uri: bookingUri,
   });
+  if (!eventDoc) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <h1 className="text-2xl font-bold">Event not found</h1>
+      </div>
+    );
+  }
+
   return (
-    <TimePicker 
-    bookingTimes={JSON.parse(JSON.stringify(etDoc.bookingTime))}
-    length={etDoc.duration}
-    username={params?.username}
-    meetingUri={params?.["booking-uri"]}/>
+    <div className="min-h-screen flex items-center justify-center">
+      <TimePicker
+        bookingTimes={eventDoc.bookingTime || []} // Ensure it's an array
+        length={eventDoc.duration || 0} // Default to 0 if undefined
+        username={username}
+        meetingUri={bookingUri}
+      />
+    </div>
   );
 }
