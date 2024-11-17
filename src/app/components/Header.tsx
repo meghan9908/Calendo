@@ -25,7 +25,6 @@ export default async function Header() {
             </div>
 
             {email ? (
-                
                 <div>
                     <nav className="flex items-center gap-4">
                         <Link href="/dashboard" className="text-white font-bold bg-blue-600 px-3 p-3 rounded-full">Dashboard</Link>
