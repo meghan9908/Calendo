@@ -28,7 +28,9 @@ export async function getSession() {
   (await
     // Populate cookieObject with name-value pairs
     cookieStore).getAll().forEach(({ name, value }) => {
-    cookieObject[name] = value;
+      if(name == 'calendix_session'){  
+        cookieObject[name] = value;
+      }
   });
 
   // Mock NextApiRequest to pass to nextAppSession
