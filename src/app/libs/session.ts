@@ -10,6 +10,6 @@ export const session = nextAppSession<MySessionData>({
   secret: process.env.SECRET as string,
   cookie: {
     httpOnly: true, // Keep this true for security
-    maxAge: 0,   // Creates a session cookie (destroyed when the browser is closed)
+    maxAge: 86400,  // 24 hours in seconds
   },
 });
