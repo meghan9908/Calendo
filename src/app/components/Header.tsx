@@ -3,7 +3,7 @@ import { getSession } from "@/app/libs/session";
 
 export default async function Header() {
   const sessionStore = await getSession(); // Use the helper function
-  const email = await sessionStore?.get('email'); // Retrieve the email
+  const email = await sessionStore?.get('calendix_session'); // Retrieve the email
   console.log("Session email in Header.tsx:", email);
 
   return (
