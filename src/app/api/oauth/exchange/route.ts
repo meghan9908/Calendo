@@ -34,8 +34,10 @@ export async function GET(req: NextRequest) {
   else{
     await ProfileModel.create({email,grantId})
   }
-  
-  await session().set('email', email);
+  const sessionStore = session();
+  await sessionStore.set('email', email);
+  console.log("Session set in route.ts with email:", email);
+
   console.log("debuging....");
   console.log("received from nylas",email)
   const session_email  =await session().get("email");
