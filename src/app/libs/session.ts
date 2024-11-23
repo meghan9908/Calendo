@@ -14,7 +14,8 @@ export const session = nextAppSession<MySessionData>({
     httpOnly: true,
     maxAge: 86400, // 24 hours
     path: '/', // Accessible across the app
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
+    sameSite:'strict',
   },
 });
 

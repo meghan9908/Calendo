@@ -1,5 +1,6 @@
-export default function FeaturesPage(){
-    return (
-        <div>Features</div>
-    )
+import { cookies } from 'next/headers';
+
+export default async function FeaturesPage() {
+  console.log((await cookies()).getAll());
+  return <div>Check Logs</div>;
 }
