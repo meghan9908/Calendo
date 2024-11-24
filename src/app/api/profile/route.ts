@@ -1,6 +1,6 @@
-import { session } from "@/app/libs/session";
 import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -8,7 +8,10 @@ export async function GET() {
         await mongoose.connect(process.env.MONGODB_URI as string);
 
         // Get email from session
-        const email = await session()?.get('email');
+        const cookieStore = cookies();
+        const sessionCookie = (await cookieStore).get("calendix_session");
+        const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+
         console.log("email", email);
         if (!email) {
             return NextResponse.json({ hasUsername: false, username: null }, { status: 401 });
@@ -40,7 +43,10 @@ export async function PUT(req: NextRequest) {
         await mongoose.connect(process.env.MONGODB_URI as string);
 
         // Get email from session
-        const email = await session()?.get('email');
+        const cookieStore = cookies();
+        const sessionCookie = (await cookieStore).get("calendix_session");
+        const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+  
         if (!email) {
             return new NextResponse("Unauthorized", { status: 401 });
         }

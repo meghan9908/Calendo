@@ -1,16 +1,19 @@
 "use server";
 import DashboardNav from "@/app/components/dashboard_Nav";
-import { session } from "@/app/libs/session";
 import { connect } from "mongoose";
 import { EventTypeModel } from "@/app/models/events";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { eventType, profileType, Weekday } from "@/app/libs/type";
 import { ProfileModel } from "@/app/models/profile";
+import { cookies } from "next/headers";
 
 export default async function Events() {
     await connect(process.env.MONGODB_URI ?? "no link");
-    const email = await session()?.get("email");
+    const cookieStore = cookies();
+    const sessionCookie = (await cookieStore).get("calendix_session");
+    const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+
 
     // Fetch profile document with generics and lean object
     const profileDoc = await ProfileModel.findOne<profileType>({ email }).lean();

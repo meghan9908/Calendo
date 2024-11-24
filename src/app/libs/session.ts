@@ -1,10 +1,5 @@
 import { ResponseCookies } from '@edge-runtime/cookies';
 
-type MySessionData = {
-  grantId?: string;
-  email?: string;
-};
-
 const COOKIE_NAME = 'calendix_session';
 
 export const session = {

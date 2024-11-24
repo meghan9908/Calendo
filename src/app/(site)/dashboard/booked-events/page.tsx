@@ -1,15 +1,17 @@
 import DashboardNav from "@/app/components/dashboard_Nav";
-import {session} from "@/app/libs/session";
 import {BookingModel} from "@/app/models/booking";
 import {EventTypeModel} from "@/app/models/events"
 import {format} from "date-fns";
 import {Calendar, CircleUser, NotepadText} from "lucide-react";
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 
 
 export default async function DashboardPage() {
   await mongoose.connect(process.env.MONGODB_URI as string);
-  const email = await session().get('email');
+  const cookieStore = cookies();
+  const sessionCookie = (await cookieStore).get("calendix_session");
+  const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
   const eventTypeDocs = await EventTypeModel.find({email});
   const bookedEvents = await BookingModel.find({
     eventTypeId: eventTypeDocs.map(doc =>  doc._id),
