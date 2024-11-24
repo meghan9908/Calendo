@@ -1,14 +1,24 @@
 import { session } from "@/app/libs/session";
-import { redirect } from "next/navigation";
+import { ResponseCookies } from "@edge-runtime/cookies";
 
 export async function GET() {
-    // Clear session data
-    await session().set('grantId',null); 
-    await session().set('email',null); 
+  // Log the action
+  console.log("logout_api");
 
-    // Optionally, clear the entire session object if supported
-    await session().destroy();
-    await redirect("/?logout=1");
-    
+  // Create headers for the response
+  const headers = new Headers();
+  const responseCookies = new ResponseCookies(headers);
 
+  // Delete the session cookie
+  console.log("response_cookies", responseCookies);
+  session.deleteSession(responseCookies);
+
+  // Return a response with a redirect
+  return new Response(null, {
+    status: 302, // Redirect status code
+    headers: {
+      Location: "/?logout=1", // Specify the redirect location
+      ...Object.fromEntries(headers), // Include the modified headers with cookies
+    },
+  });
 }

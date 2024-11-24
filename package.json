@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@edge-runtime/cookies": "^5.0.2",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
+    "edge-runtime": "^3.0.5",
     "lucide": "^0.454.0",
     "lucide-react": "^0.454.0",
     "mongoose": "^8.8.0",

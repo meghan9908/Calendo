@@ -1,40 +1,47 @@
-import { NextApiRequest } from 'next';
-import nextAppSession from 'next-app-session';
-import { cookies } from 'next/headers';
+import { ResponseCookies } from '@edge-runtime/cookies';
 
 type MySessionData = {
   grantId?: string;
   email?: string;
 };
 
-export const session = nextAppSession<MySessionData>({
-  name: 'calendix_session',
-  secret: process.env.SECRET as string,
-  cookie: {
-    httpOnly: true,
-    maxAge: 86400, // 24 hours
-    path: '/', // Accessible across the app
-    secure: true,
-    sameSite:'strict',
+const COOKIE_NAME = 'calendix_session';
+
+export const session = {
+  setSession: (cookies: ResponseCookies, value: string) => {
+    cookies.set(COOKIE_NAME, value, {
+      maxAge: 86400,
+      path: '/',
+      httpOnly: true,
+      secure: true, // Only send over HTTPS
+      sameSite: 'strict',
+    });
   },
-});
 
-// Helper function to integrate with App Router
-export async function getSession() {
-  const cookieStore = cookies(); // Get cookies from headers
-  const cookieObject: { [key: string]: string } = {};
+  getSession: (cookies: ResponseCookies): string | undefined => {
+    return cookies.get(COOKIE_NAME)?.value;
+  },
 
-  // Populate cookieObject with name-value pairs
-  (await
-    // Populate cookieObject with name-value pairs
-    cookieStore).getAll().forEach(({ name, value }) => {
-      if(name == 'calendix_session'){  
-        cookieObject[name] = value;
-      }
-  });
+  deleteSession: (cookies: ResponseCookies) => {
+    // Correct usage of delete() method
+    cookies.delete(COOKIE_NAME); // No second parameter
+  },
+};
 
-  // Mock NextApiRequest to pass to nextAppSession
-  const mockReq = { cookies: cookieObject };
+// Example usage in an API route or server function
+export async function GET() {
+  const headers = new Headers();
+  const responseCookies = new ResponseCookies(headers);
 
-  return session(mockReq as NextApiRequest); // Cast to satisfy type
+  // Set a new session cookie
+  session.setSession(responseCookies, 'example-session-value');
+
+  // Retrieve session cookie
+  const sessionValue = session.getSession(responseCookies);
+  console.log('Session Value:', sessionValue);
+
+  // Delete an old cookie
+  session.deleteSession(responseCookies);
+
+  return new Response(null, { headers, status: 200 });
 }

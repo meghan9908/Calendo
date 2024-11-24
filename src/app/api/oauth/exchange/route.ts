@@ -1,18 +1,18 @@
 import { nylas, nylasConfig } from "@/app/libs/nylas";
-import { session } from "@/app/libs/session";
 import { ProfileModel } from "@/app/models/profile";
 import mongoose from "mongoose";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   console.log("Received callback from Nylas");
-  const url = new URL(req.url ?? "");
-  const code = url.searchParams.get('code');
 
+  const url = new URL(req.url ?? "");
+  const code = url.searchParams.get("code");
 
   if (!code) {
-    return Response.json("No Authorization code Returned from Nylas", { status: 400 });
+    return new Response("No Authorization code returned from Nylas", { status: 400 });
   }
 
   const response = await nylas.auth.exchangeCodeForToken({
@@ -21,37 +21,37 @@ export async function GET(req: NextRequest) {
     redirectUri: nylasConfig.callbackUri, // URI you registered with Nylas in the previous step
     code,
   });
+
   const { grantId, email } = response;
-  
-  await mongoose.connect(process.env.MONGODB_URI ?? 'No URL');
-  const profileDoc = await ProfileModel.findOne({
-    email:email
-  })
-  if(profileDoc){
-    profileDoc.grantId = grantId
-    await profileDoc.save()
+
+  if (!email) {
+    return new Response("Failed to retrieve email from Nylas", { status: 400 });
   }
-  else{
-    await ProfileModel.create({email,grantId})
+
+  await mongoose.connect(process.env.MONGODB_URI ?? "No URL");
+
+  const profileDoc = await ProfileModel.findOne({ email });
+  if (profileDoc) {
+    profileDoc.grantId = grantId;
+    await profileDoc.save();
+  } else {
+    await ProfileModel.create({ email, grantId });
   }
-  const sessionStore = session();
-  await sessionStore.set('email', email);
-  console.log("Session set in route.ts with email:", email);
 
-  console.log("debuging....");
-  console.log("received from nylas",email)
-  const session_email  =await session().get("email");
-  console.log("session_email",session_email);
+  // Set session cookie
+  const cookieStore = cookies();
+  (await cookieStore).set({
+    name: "calendix_session",
+    value: email,
+    maxAge: 86400, // 24 hours in seconds
+    path: "/", // Cookie accessible across the app
+    httpOnly: true, // Prevent client-side JavaScript access
+    secure: true, // Only send over HTTPS
+    sameSite: "strict", // Restrict third-party usage
+  });
 
+  console.log("Session set with email:", email);
 
-
-
-  // You'll use this grantId to make API calls to Nylas perform actions on 
-  // behalf of this account. Store this in a database, associated with a user
-  process.env.NYLAS_GRANT_ID = grantId
-  // This depends on implementation. If the browser is hitting this endpoint
-  // you probably want to use res.redirect('/some-successful-frontend-url')
-  await redirect('/');
-
-
+  // Redirect to the home page or another appropriate route
+  await redirect("/");
 }
