@@ -8,7 +8,7 @@ export default async function FeaturesPage() {
   return (
     <>
     <pre>
-        <div>Check Logs{JSON.stringify(cookieStore)}</div>
+        <div>Check Logs{JSON.stringify(sessionCookie)}</div>
         <br/>
         <br/>
         {JSON.stringify(email)}
