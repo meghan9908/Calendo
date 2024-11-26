@@ -12,7 +12,7 @@ export default async function Dashboard() {
   const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
   console.log("session email in dashboard", email);
   if (!email) {
-    redirect('/');
+    await redirect('/');
   }
   const ProfileDoc = await ProfileModel.findOne({email});
   return (

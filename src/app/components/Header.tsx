@@ -5,7 +5,7 @@ export default async function Header() {
   // Retrieve the session cookie
   const cookieStore = cookies();
   const sessionCookie = (await cookieStore).get("calendix_session");
-  const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+  const email = await sessionCookie?.value; // Extract the email from the cookie value if it exists
 
   console.log("Session email in Header.tsx:", email);
 
