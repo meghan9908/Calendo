@@ -10,7 +10,7 @@ export default async function Dashboard() {
   const cookieStore = cookies();
   const sessionCookie = (await cookieStore).get("calendix_session");
   const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
-
+  console.log("session email in dashboard", email);
   if (!email) {
     redirect('/');
   }
