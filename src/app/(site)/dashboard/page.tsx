@@ -9,7 +9,7 @@ export default async function Dashboard() {
   await mongoose.connect(process.env.MONGODB_URI as string);
   const cookieStore = cookies();
   const sessionCookie = (await cookieStore).get("calendix_session");
-  const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+  const email = await sessionCookie?.value; // Extract the email from the cookie value if it exists
   console.log("session email in dashboard", email);
   if (!email) {
     await redirect('/');

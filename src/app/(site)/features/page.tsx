@@ -1,9 +1,9 @@
 import { cookies } from 'next/headers';
 
 export default async function FeaturesPage() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const sessionCookie = (await cookieStore).get("calendix_session");
-    const email = sessionCookie?.value; // Extract the email from the cookie value if it exists
+    const email =await sessionCookie?.value; // Extract the email from the cookie value if it exists
   
   return (
     <>
