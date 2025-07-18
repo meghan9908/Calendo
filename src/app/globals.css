@@ -129,3 +129,57 @@ form label span{
 .flip-card-back {
   transform: rotateY(180deg);
 }
+.accordion-container {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+
+.accordion-item {
+  margin-bottom: 20px;
+  transition: max-height 0.3s ease, visibility 0.3s ease;
+}
+
+.accordion-button {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 15px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.accordion-button h3 {
+  flex-grow: 1;
+  margin: 0;
+  font-size: 18px;
+}
+
+.accordion-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.accordion-content {
+  max-height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  transition: max-height 0.3s ease, visibility 0.3s ease;
+}
+
+.accordion-content.visible {
+  max-height: 300px;
+  visibility: visible;
+}
+
+.accordion-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.accordion-item.open {
+  background-color: #f9f9f9;
+}

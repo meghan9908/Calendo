@@ -1,31 +1,23 @@
+// src/app/(booking)/[username]/[booking-uri]/[booking-time]/page.tsx
 'use client';
 
 import axios from "axios";
 import { format, isValid} from "date-fns";
 import { FormEvent, useState } from "react";
-import { use } from "react";
 
 type PageProps = {
-  params: Promise<{
+  params: {
     username: string;
     "booking-uri": string;
     "booking-time": string;
-  }>;
+  };
 };
 
-export default function BookingFormPage(props: PageProps) {
-  // Unwrap params
-  const params = use(props.params);
+export default async function BookingFormPage({ params }: PageProps) {
+  const { username, "booking-uri": bookingUri, "booking-time": rawTime } = await params;
 
-  // Extract parameters
-  const username = params.username;
-  const bookingUri = params["booking-uri"];
-
-  // Decode and parse the booking time
-  const rawBookingTime = decodeURIComponent(params["booking-time"]);
+  const rawBookingTime = decodeURIComponent(rawTime);
   const parsedTime = new Date(rawBookingTime);
-
-  // Ensure valid booking time
   const bookingTime = isValid(parsedTime) ? parsedTime : null;
 
   if (bookingTime) {
@@ -59,57 +51,72 @@ export default function BookingFormPage(props: PageProps) {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
-      <div className="text-left p-8 w-full max-w-md bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl text-gray-700 font-bold mb-6 pb-2 border-b border-gray-200">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4">
+      <div className="text-left p-8 w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100">
+        <h2 className="text-2xl text-gray-800 font-bold mb-6 pb-4 border-b border-gray-200">
           {bookingTime
             ? format(bookingTime, "EEEE, MMMM d, yyyy HH:mm") // Display in proper format
             : "Invalid Time"}
         </h2>
         {confirmed ? (
-          <div className="text-center text-green-600 font-semibold">
-            🎉 Thank you for your booking!
+          <div className="text-center py-8">
+            <div className="text-6xl mb-4">🎉</div>
+            <h3 className="text-xl font-semibold text-green-600 mb-2">
+              Booking Confirmed!
+            </h3>
+            <p className="text-gray-600">
+              Thank you for your booking. You'll receive a confirmation email shortly.
+            </p>
           </div>
         ) : (
-          <form onSubmit={handleFormSubmit} className="space-y-4">
-            <label className="block">
-              <span className="font-medium text-gray-600">Your Name</span>
+          <form onSubmit={handleFormSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Your Name
+              </label>
               <input
                 value={guestName}
                 onChange={(ev) => setGuestName(ev.target.value)}
                 type="text"
                 placeholder="John Doe"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 required
               />
-            </label>
-            <label className="block">
-              <span className="font-medium text-gray-600">Your Email</span>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Your Email
+              </label>
               <input
                 value={guestEmail}
                 onChange={(ev) => setGuestEmail(ev.target.value)}
                 type="email"
                 placeholder="test@example.com"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 required
               />
-            </label>
-            <label className="block">
-              <span className="font-medium text-gray-600">Additional Information</span>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Additional Information
+              </label>
               <textarea
                 value={guestNotes}
                 onChange={(ev) => setGuestNotes(ev.target.value)}
                 placeholder="Any relevant information (optional)"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-xl shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
                 rows={4}
               />
-            </label>
-            <div className="text-right">
+            </div>
+            
+            <div className="pt-4">
               <button
                 type="submit"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700 transition-all duration-200 ease-in-out"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-md hover:from-blue-700 hover:to-blue-800 hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
-                Confirm
+                Confirm Booking
               </button>
             </div>
           </form>

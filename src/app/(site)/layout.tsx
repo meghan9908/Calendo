@@ -16,7 +16,7 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
   return (
     <html lang="en">
       <body className={`${noto.className} ${noto.className} antialiased`}>
-        <main className="container">
+        <main>
         <Header/> 
 
         {children}
