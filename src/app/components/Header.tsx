@@ -1,6 +1,8 @@
+// Header.tsx
+
 import Link from "next/link";
 import { cookies } from "next/headers"; // Import cookies directly from next/headers
-
+export const dynamic = "force-dynamic"; // <- Add this at the top
 export default async function Header() {
   // Retrieve the session cookie
   const cookieStore = cookies();

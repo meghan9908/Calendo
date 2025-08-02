@@ -53,5 +53,6 @@ export async function GET(req: NextRequest) {
   console.log("Session set with email:", email);
 
   // Redirect to the home page or another appropriate route
-  await redirect("/");
+  await redirect("/redirect");
+
 }

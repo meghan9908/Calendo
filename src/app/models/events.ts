@@ -1,4 +1,5 @@
-
+// events.ts
+// This file defines the EventType model for MongoDB using Mongoose.
 import { Schema,model, models } from "mongoose";
 import { Weekday,timeSchema,eventType } from "../libs/type";
 

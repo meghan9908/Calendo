@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans } from "next/font/google";
-import "./../globals.css";
+import "./../styles/globals.css";
+import "./../styles/animations.css";
+import "./../styles/enhanced-styles.css";
 import Header from "../components/Header";
 
 
@@ -16,7 +18,7 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
   return (
     <html lang="en">
       <body className={`${noto.className} ${noto.className} antialiased`}>
-        <main className="container">
+        <main>
         <Header/> 
 
         {children}

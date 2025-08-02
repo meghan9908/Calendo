@@ -1,3 +1,4 @@
+//Timepicker.tsx
 'use client';
 
 import {
@@ -18,7 +19,7 @@ import {
 import clsx from "clsx";
 import Link from "next/link";
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { TimeSlot } from "nylas";
 import { short_days } from "../libs/shared";
 import { BookingType, Weekday } from "../libs/type";
@@ -36,6 +37,7 @@ export default function TimePicker({
     meetingUri: string;
     length: number;
 }) {
+    console.log("bookingTimes", bookingTimes);
     const currentDate = new Date();
     const [activeMonthDate, setActiveMonthDate] = useState(currentDate);
     const [selectedDate, setSelectedDate] = useState<null | Date>(null);
@@ -47,7 +49,24 @@ export default function TimePicker({
     const activeYear = activeMonthDate.getFullYear();
     const firstDate = new Date(activeYear, activeMonth, 1);
     const lastDate = lastDayOfMonth(activeMonthDate).getDate();
-    const daysInMonth = useMemo(() => Array.from({ length: lastDate }), [activeMonthDate]);
+    const daysInMonth = useMemo(() => Array.from({ length: lastDate }), [lastDate]);
+
+    // Memoize the generateTimeSlots function to prevent recreation on every render
+    const generateTimeSlots = useCallback((from: string, to: string, selectedDate: Date) => {
+        const fromTime = parse(from, "HH:mm", selectedDate);
+        const toTime = parse(to, "HH:mm", selectedDate);
+
+        if (fromTime >= toTime) return [];
+        const slots: Date[] = [];
+        let current = fromTime;
+
+        while (current <= toTime) {
+            slots.push(current);
+            current = addMinutes(current, length);
+        }
+
+        return slots;
+    }, [length]);
 
     useEffect(() => {
         if (selectedDate) {
@@ -60,23 +79,24 @@ export default function TimePicker({
             axios
                 .get(`/api/busy?${params.toString()}`)
                 .then((response) => {
-                    console.log(new Date(response.data?.[0].startTime),new Date(response.data?.[0].endTime));
-                    setBusyTimeSlots(response.data);
+                    console.log(new Date(response.data?.[0]?.startTime), new Date(response.data?.[0]?.endTime));
+                    setBusyTimeSlots(response.data || []);
                 })
                 .catch((error) => {
                     console.error("Error fetching busy times:", error);
+                    setBusyTimeSlots([]);
                 })
                 .finally(() => setIsLoading(false));
         }
     }, [selectedDate, username]);
 
-    function isWithinBusySlot(time: Date) {
+    const isWithinBusySlot = useCallback((time: Date) => {
         const bookingFrom = time;
         const bookingTo = addMinutes(time, length);
 
         return busyTimeSlots.some((busySlot) => {
-            const busyFrom = new Date(parseInt(busySlot.startTime)*1000);
-            const busyTo = new Date(parseInt(busySlot.endTime)*1000);
+            const busyFrom = new Date(parseInt(busySlot.startTime) * 1000);
+            const busyTo = new Date(parseInt(busySlot.endTime) * 1000);
 
             return (
                 (isAfter(bookingFrom, busyFrom) && isBefore(bookingFrom, busyTo)) ||
@@ -84,23 +104,7 @@ export default function TimePicker({
                 (isEqual(bookingFrom, busyFrom) && isEqual(bookingTo, busyTo))
             );
         });
-    }
-
-    function generateTimeSlots(from: string, to: string) {
-        const fromTime = parse(from, "HH:mm", selectedDate as Date);
-        const toTime = parse(to, "HH:mm", selectedDate as Date);
-
-        if (fromTime >= toTime) return [];
-        const slots: Date[] = [];
-        let current = fromTime;
-
-        while (current <= toTime) {
-            slots.push(current);
-            current = addMinutes(current, length);
-        }
-
-        return slots;
-    }
+    }, [busyTimeSlots, length]);
 
     useEffect(() => {
         if (selectedDate) {
@@ -108,63 +112,71 @@ export default function TimePicker({
             const weekdayConfig = bookingTimes?.[weekdayName];
 
             if (weekdayConfig?.active && weekdayConfig.From && weekdayConfig.To) {
-                setTimeSlots(generateTimeSlots(weekdayConfig.From, weekdayConfig.To));
+                setTimeSlots(generateTimeSlots(weekdayConfig.From, weekdayConfig.To, selectedDate));
             } else {
                 setTimeSlots(null);
             }
         }
-    }, [selectedDate]);
+    }, [selectedDate, bookingTimes, generateTimeSlots]);
 
     return (
-        <div className="flex gap-4 py-4">
+        <div className="flex flex-col lg:flex-row gap-8 py-6 px-4 bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
             {/* Calendar Section */}
-            <div>
-                <div className="flex items-center mb-4">
-                    <span className="grow font-bold text-lg">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex-1 max-w-md">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
                         {format(activeMonthDate, "MMMM")} {activeYear}
-                    </span>
-                    <button
-                        onClick={() => setActiveMonthDate((prev) => subMonths(prev, 1))}
-                        disabled={activeMonthDate <= currentDate}
-                        className="text-gray-600 hover:text-gray-800 disabled:opacity-50"
-                        aria-label="Previous Month"
-                    >
-                        <ChevronLeft size={30}/>
-                    </button>
-                    <button
-                        onClick={() => setActiveMonthDate((prev) => addMonths(prev, 1))}
-                        className="text-gray-600 hover:text-gray-800"
-                        aria-label="Next Month"
-                    >
-                        <ChevronRight size={32}/>
-                    </button>
+                    </h2>
+                    <div className="flex items-center space-x-2">
+                        <button
+                            onClick={() => setActiveMonthDate((prev) => subMonths(prev, 1))}
+                            disabled={activeMonthDate <= currentDate}
+                            className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105"
+                            aria-label="Previous Month"
+                        >
+                            <ChevronLeft size={20} className="text-gray-600" />
+                        </button>
+                        <button
+                            onClick={() => setActiveMonthDate((prev) => addMonths(prev, 1))}
+                            className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-all duration-200 hover:scale-105"
+                            aria-label="Next Month"
+                        >
+                            <ChevronRight size={20} className="text-gray-600" />
+                        </button>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-7 gap-2">
+                <div className="grid grid-cols-7 gap-2 mb-4">
                     {short_days.map((day, index) => (
-                        <span key={index} className="text-center font-medium text-gray-600">
+                        <span key={index} className="text-center font-semibold text-gray-500 text-sm py-2">
                             {day}
                         </span>
                     ))}
+                </div>
+
+                <div className="grid grid-cols-7 gap-2">
                     {Array.from({ length: firstDate.getDay() }).map((_, index) => (
-                        <div key={`empty-${index}`} />
+                        <div key={`empty-${index}`} className="w-10 h-10" />
                     ))}
                     {daysInMonth.map((_, index) => {
                         const day = new Date(activeYear, activeMonth, index + 1);
                         const weekdayConfig = bookingTimes?.[format(day, "EEEE") as Weekday];
                         const canBeBooked = weekdayConfig?.active && (isFuture(day) || isToday(day));
-                        const isSelected = isEqual(day, selectedDate as Date);
+                        const isSelected = selectedDate && isEqual(day, selectedDate);
 
                         return (
                             <button
                                 key={index}
                                 className={clsx(
-                                    "w-8 h-8 rounded-full transition-all",
-                                    canBeBooked ? "bg-blue-100 hover:bg-blue-200" : "bg-gray-300",
-                                    isToday(day) ? "border-2 border-blue-500" : "",
-                                    isSelected ? "bg-blue-600 text-white" : ""
+                                    "w-10 h-10 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50",
+                                    canBeBooked 
+                                        ? "bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 hover:border-blue-300 shadow-sm hover:shadow-md" 
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed",
+                                    isToday(day) ? "ring-2 ring-blue-400 ring-opacity-60" : "",
+                                    isSelected ? "bg-blue-600 text-white shadow-lg hover:bg-blue-700 border-blue-600" : ""
                                 )}
                                 onClick={() => canBeBooked && setSelectedDate(day)}
+                                disabled={!canBeBooked}
                             >
                                 {index + 1}
                             </button>
@@ -174,37 +186,91 @@ export default function TimePicker({
             </div>
 
             {/* Time Selection Section */}
-            <div className="p-4 bg-gray-100 rounded shadow w-64">
-                <h3 className="font-bold mb-2">Available Times</h3>
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 flex-1 max-w-sm">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-gray-800">Available Times</h3>
+                    {selectedDate && (
+                        <div className="text-sm text-gray-500 font-medium">
+                            {format(selectedDate, "MMM d, yyyy")}
+                        </div>
+                    )}
+                </div>
+
                 {isLoading ? (
-                    <div className="flex justify-center text-center items-center"><BounceLoader className="mt-8" size={72} color="#3B82F6"/></div>
+                    <div className="flex justify-center items-center py-16">
+                        <div className="text-center">
+                            <BounceLoader size={48} color="#3B82F6" />
+                            <p className="text-gray-500 mt-4 text-sm">Loading available slots...</p>
+                        </div>
+                    </div>
                 ) : selectedDate && timeSlots ? (
-                    <div className="gap-y-2">
-                        {timeSlots.map((slot, index) => {
-                            const isBusy = isWithinBusySlot(slot);
-                            console.log("isBusy",isBusy);
-                            return (
-                                <Link
-                                    key={index}
-                                    href={isBusy ? "#" : `./${meetingUri}/${slot.toISOString()}`}
-                                    className={clsx(
-                                        "block py-2 mb-1 px-4 gap-2 rounded",
-                                        isBusy
-                                            ? "bg-gray-300 cursor-not-allowed"
-                                            : "bg-blue-600 text-white hover:bg-blue-700"
-                                    )}
-                                    aria-disabled={isBusy}
-                                    title={isBusy ? "This time slot is unavailable" : "Book this time"}
-                                >
-                                    {format(slot, "HH:mm")}
-                                </Link>
-                            );
-                        })}
+                    <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                        {timeSlots.length > 0 ? (
+                            timeSlots.map((slot, index) => {
+                                const isBusy = isWithinBusySlot(slot);
+                                console.log("isBusy", isBusy);
+                                return (
+                                    <Link
+                                        key={index}
+                                        href={
+                                            isBusy
+                                                ? "#"
+                                                : `/${username}/${meetingUri}/${encodeURIComponent(slot.toISOString())}`
+                                        }
+                                        className={clsx(
+                                            "block py-3 px-4 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-center",
+                                            isBusy
+                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
+                                                : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg focus:ring-blue-500 border border-blue-600"
+                                        )}
+                                        aria-disabled={isBusy}
+                                        title={isBusy ? "This time slot is unavailable" : "Book this time"}
+                                        onClick={(e) => isBusy && e.preventDefault()}
+                                    >
+                                        <div className="flex items-center justify-center space-x-2">
+                                            <span>{format(slot, "HH:mm")}</span>
+                                            {isBusy && (
+                                                <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+                                                    Busy
+                                                </span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                );
+                            })
+                        ) : (
+                            <div className="text-center py-8">
+                                <div className="text-gray-400 text-4xl mb-2">📅</div>
+                                <p className="text-gray-500">No available slots for this day.</p>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <p className="text-gray-600">No available slots for this day.</p>
+                    <div className="text-center py-12">
+                        <div className="text-gray-300 text-6xl mb-4">🗓️</div>
+                        <p className="text-gray-500 text-lg">Select a date to view available times</p>
+                        <p className="text-gray-400 text-sm mt-2">Choose from the calendar on the left</p>
+                    </div>
                 )}
             </div>
+
+            {/* Custom Scrollbar Styles */}
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: #f1f5f9;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #cbd5e1;
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #94a3b8;
+                }
+            `}</style>
         </div>
     );
 }

@@ -1,3 +1,5 @@
+// profile.ts
+// This file defines the Profile model for MongoDB using Mongoose.
 import mongoose, { models, Schema, model } from "mongoose";
 
 export interface Iprofile extends mongoose.Document {

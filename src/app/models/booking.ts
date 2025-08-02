@@ -1,3 +1,5 @@
+// booking.ts
+// This file defines the Booking model for MongoDB using Mongoose.
 import mongoose, { model, models, Schema } from "mongoose";
 
 interface Ibooking extends mongoose.Document{
