@@ -1,3 +1,4 @@
+// Enhanced Trustees.tsx
 'use client'
 import { useState, useEffect } from 'react';
 
@@ -13,51 +14,56 @@ export default function Trustees() {
         { img: "https://img.freepik.com/free-photo/image-young-hopeful-woman-smiling-happy-looking-aside-empty-space-white_176420-41242.jpg?t=st=1730373623~exp=1730377223~hmac=9807c1ec7e4c6f052068c3b15a5e9eb5be794b7f9941839991fc8de55334224f&w=740", role: "Freelancer" },
         { img: "https://img.freepik.com/premium-photo/close-up-portrait-his-he-nice-attractive-smart-clever-cheerful-cheery-doc-professor-emergency-center-owner-director-ceo-boss-chief-isolated-light-white-gray-pastel-color_274222-21030.jpg?w=740", role: "Doctor" },
         { img: "https://img.freepik.com/premium-photo/architecture-serious-portrait-man-construction-site-engineering-design-building-labor-real-estate-property-with-face-contractor-renovation-builder-maintenance_590464-205042.jpg?w=740", role: "Architect" }
-
-    
-    
     ];
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % Math.ceil(users.length / 3)); // Move to next slide every 3 seconds
-        }, 3000);
+            setCurrentSlide((prev) => (prev + 1) % Math.ceil(users.length / 3));
+        }, 4000); // Increased to 4 seconds for better viewing
         return () => clearInterval(interval);
     }, [users.length]);
 
     return (
-        <section className="text-center mt-24">
-            <h2 className="text-2xl text-gray-600">Our Beloved Users</h2>
-            <div className="overflow-hidden relative mt-5">
+        <section className="trustees-section text-center fade-in-up">
+            <h2 className="float-animation">Our Beloved Users</h2>
+            <div className="carousel-container">
                 <div
-                    className="flex transition-transform duration-500 ease-in-out"
+                    className="carousel-track"
                     style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
-                    {/* Group items in sets of 3 */}
                     {Array.from({ length: Math.ceil(users.length / 3) }).map((_, groupIndex) => {
-                            
-                           return (<div key={groupIndex} className="flex min-w-full justify-around">
-                
-                            {users.slice(groupIndex * 3, groupIndex * 3 + 3).map((user, index) => (
-                                <div key={index} className="flex flex-col items-center">
-                                    <img src={user.img} alt={user.role} className="w-24 h-24 rounded-full object-cover" />
-                                    <p className="caption mt-2 text-gray-600">{user.role}</p>
-                                </div>
-                            ))}
-                        </div>);}
-                    )}
+                        return (
+                            <div key={groupIndex} className="carousel-slide">
+                                {users.slice(groupIndex * 3, groupIndex * 3 + 3).map((user, index) => (
+                                    <div key={index} className="user-card">
+                                        <img 
+                                            src={user.img} 
+                                            alt={user.role} 
+                                            className="user-avatar"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = "https://via.placeholder.com/100x100/667eea/ffffff?text=" + user.role.charAt(0);
+                                            }}
+                                        />
+                                        <p className="user-role">{user.role}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-            {/* Carousel navigation */}
-            <div className="flex justify-center gap-2 mt-4">
+            
+            <div className="carousel-indicators">
                 {Array.from({ length: Math.ceil(users.length / 3) }).map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
-                        className={`w-3 h-3 rounded-full ${currentSlide === index ? 'bg-gray-800' : 'bg-gray-400'}`}
+                        className={`carousel-dot ${currentSlide === index ? 'active' : 'inactive'}`}
+                        aria-label={`Go to slide ${index + 1}`}
                     ></button>
                 ))}
             </div>
         </section>
     );
 }
+

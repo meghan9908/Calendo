@@ -1,3 +1,4 @@
+//(site)/page.tsx
 import { Suspense } from "react";
 import Intro from "../components/Intro";
 import Trustees from "../components/Trustees";

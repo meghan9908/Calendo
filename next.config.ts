@@ -1,7 +1,9 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // This will allow dots `.` and other chars in URL
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+  trailingSlash: false,
+  reactStrictMode: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;

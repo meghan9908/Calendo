@@ -1,3 +1,4 @@
+// testimonials.tsx
 'use client';
 
 export default function Testimonials() {

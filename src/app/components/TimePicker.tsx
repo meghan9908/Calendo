@@ -215,7 +215,7 @@ export default function TimePicker({
                                         href={
                                             isBusy
                                                 ? "#"
-                                                : `/booking/${username}/${meetingUri}/${(slot.toISOString())}`
+                                                : `/${username}/${meetingUri}/${encodeURIComponent(slot.toISOString())}`
                                         }
                                         className={clsx(
                                             "block py-3 px-4 rounded-xl font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-opacity-50 text-center",

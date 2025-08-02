@@ -1,35 +1,66 @@
+
+// Enhanced Accordion.tsx
 "use client";
 import { useState } from 'react';
 
-const AccordionItem = ({ title, content, imageSrc, iconFill, index }: { title: string, content: string, imageSrc: string, iconFill: string, index: number }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const AccordionItem = ({ 
+    title, 
+    content, 
+    imageSrc, 
+    iconFill, 
+    index 
+}: { 
+    title: string, 
+    content: string, 
+    imageSrc: string, 
+    iconFill: string, 
+    index: number 
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-  const toggleAccordion = () => {
-    setIsOpen(!isOpen);
-  };
+    const toggleAccordion = () => {
+        setIsOpen(!isOpen);
+    };
 
-  return (
-    <div className={`accordion-item ${isOpen ? 'open' : ''}`} style={{ '--progress-bar': isOpen ? '100%' : '0%' } as React.CSSProperties}>
-      <button onClick={toggleAccordion} className="accordion-button">
-        <div className="accordion-icon" style={{ fill: iconFill }}>
-          <svg width="24" height="24">
-            <use href={`/media/icons/brand-shapes.svg#filled-3d-0${index}`}></use>
-          </svg>
+    return (
+        <div 
+            className={`accordion-item ${isOpen ? 'open' : ''}`} 
+            style={{ '--progress-bar': isOpen ? '100%' : '0%' } as React.CSSProperties}
+        >
+            <button 
+                onClick={toggleAccordion} 
+                className="accordion-button"
+                aria-expanded={isOpen}
+                aria-controls={`accordion-content-${index}`}
+            >
+                <div className="accordion-icon" style={{ backgroundColor: `${iconFill}20` }}>
+                    <svg width="24" height="24" style={{ fill: iconFill }}>
+                        <use href={`/media/icons/brand-shapes.svg#filled-3d-0${index}`}></use>
+                    </svg>
+                </div>
+                <h3>{title}</h3>
+            </button>
+            <div 
+                id={`accordion-content-${index}`}
+                className={`accordion-content ${isOpen ? 'visible' : ''}`}
+            >
+                <p>{content}</p>
+                <div className="accordion-image">
+                    <img 
+                        src={imageSrc} 
+                        alt={title}
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/800x400/667eea/ffffff?text=Image+Not+Found";
+                        }}
+                    />
+                </div>
+            </div>
         </div>
-        <h3>{title}</h3>
-      </button>
-      <div className={`accordion-content ${isOpen ? 'visible' : ''}`}>
-        <p>{content}</p>
-        <div className="accordion-image">
-          <img src={imageSrc} alt={title} />
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 const Accordion = () => {
-  const accordionData = [
+    const accordionData = [
     {
       title: 'Connect your calendars',
       content: 'Calendly connects up to six calendars to automate scheduling with real-time availability.',
@@ -67,20 +98,20 @@ const Accordion = () => {
     }
   ];
 
-  return (
-    <div className="accordion-container">
-      {accordionData.map((item, index) => (
-        <AccordionItem
-          key={index}
-          title={item.title}
-          content={item.content}
-          imageSrc={item.imageSrc}
-          iconFill={item.iconFill}
-          index={index + 1}
-        />
-      ))}
-    </div>
-  );
+    return (
+        <div className="accordion-container fade-in-up">
+            {accordionData.map((item, index) => (
+                <AccordionItem
+                    key={index}
+                    title={item.title}
+                    content={item.content}
+                    imageSrc={item.imageSrc}
+                    iconFill={item.iconFill}
+                    index={item.index}
+                />
+            ))}
+        </div>
+    );
 };
 
 export default Accordion;
